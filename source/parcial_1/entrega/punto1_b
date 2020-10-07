@@ -1,0 +1,43 @@
+/** subrutina_encodeo_mime
+* Encodea 3 bytes en formato MIME. Internamente =tabla apunta a la tabla de conversion.
+* @param R4 - Puntero a bloque de datos
+* @param R5 - Puntero cadena Resultado
+* @return VOID - Escribe en R5 los resultados.
+*
+*/
+
+/* Subrutina_modulo
+ * Calcula el modulo de dos numeros de 16 bits. Devuelve el resultado en 16 bits.
+ * Parametro - R0 - dividendo, unsigned 16 bits
+ * Parametro - R1 - modulo,  unsigned 16 bits
+ * Retorno - Carga en [R0] el resultado del modulo.
+ */
+
+/** subrutina_encodeo_cadena
+* Encodea una cadena de bytes en formato MIME. Utiliza subrutina_encodeo_mime y subrutina_modulo
+* @param R4 - Puntero a bloque de datos
+* @param R5 - Puntero cadena Resultado
+* @param R6 - Cantidad de bytes a convertir
+* @return VOID - Escribe en R5 los resultados.
+*/
+subrutina_encodeo_cadena
+	PUSH {R4-R6, LR}
+	LDR R0, R6  		//Copio la cantidad de bytes a convertir
+	MOV R1, #3			//cargo el modulo para subrutina
+	BL	subrutina_modulo //Me devuelve el resto de 3
+	SUB R6, R0			//Me deja solo multiplos de 3. Lo uso como mi tope para no convertir demas.
+	MOV R0, #1			//Inicio contador
+
+subrutina_e_c_lazo:
+
+	LDR R4, [R0], #3	//Desplazo con postindexado el puntero unos 3 bytes.
+	LDR R5, [R0], #3
+	BL subrutina_encodeo_mime	//Llamo la subrutina para encodear 3bytes
+
+	ADD R0, #1			//agrego una iteracion
+
+	CMP R0, R6			//Corto en la [R6] iteracion
+	IT NE				//Checkeo si recorri el lazo suficientes veces
+	BNE lazo			//recorro lazo
+	POP {R4-R6}			//Retorno los valores del stack
+	BX					//Vuelvo a subrutina_encodeo_cadena

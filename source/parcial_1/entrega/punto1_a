@@ -1,0 +1,42 @@
+/**
+* Encodea 3 bytes en formato MIME. Internamente =tabla apunta a la tabla de conversion.
+* @param R4 - Puntero a bloque de datos
+* @param R5 - Puntero cadena Resultado
+* @return VOID - Escribe en R5 los resultados.
+*
+*/
+
+subrutina_encodeo_mime
+	LDR		R0, =tabla			//Consigo la direccion a la tabla de conversion.
+
+	LDRB	R1, [R4] 			//Cargo como byte lo que este en el bloque de datos
+	AND 	R1, #0x000000fc		//Elimino los 2 bits -sig, que no necesito mediante una mascara.
+	LRS 	R1, #2				//Hago un shift a la derecha asi tengo bien los valores para la tabla.
+	LDRB	R1, [R0], R1		//Busco el valor en la tabla de conversion
+	STRB	R4, [R4]			//Guardo en la tabla de conversion
+
+	LDRB	R1, [R4] 			//Cargo como byte lo que este en el bloque de datos
+	LDRB	R2, [R4], #1 		//Cargo como byte lo que este en el bloque de datos
+	AND 	R1, #0x00000003		//Dejo los 2 bits -sig, mediante una mascara.
+	LRS		R1, #4				//Ajusto asi estos son ahora los bits 6 y 5
+	AND 	R2, #0x000000f0		//Elimino los 4 bits -sig, que no necesito mediante una mascara.
+	LRL		R2, #4				//Ajusto asi son 4 - 0
+	OR		R1, R2				//Dejo los 6 bits listos para ser 
+	LDRB	R1, [R0], R1		//Busco el valor en la tabla de conversion
+	STRB	R4, [R4], #1		//Guardo en la tabla de conversion
+
+	LDRB	R1, [R4], #1 		//Cargo como byte lo que este en el bloque de datos
+	LDRB	R2, [R4], #2 		//Cargo como byte lo que este en el bloque de datos
+	AND 	R1, #0x0000000f		//Dejo los 4 bits -sig, mediante una mascara.
+	LRL		R1, #2				//Ajusto asi estos son ahora los bits 6 - 2
+	AND 	R2, #0x000000c0		//Elimino los 6 bits -sig, que no necesito mediante una mascara.
+	LRS		R2, #4				//Ajusto asi son 2 - 0
+	OR		R1, R2				//Dejo los 6 bits listos para ser 
+	LDRB	R1, [R0], R1		//Busco el valor en la tabla de conversion
+	STRB	R4, [R4], #2		//Guardo en la tabla de conversion
+
+	LDRB	R1, [R4], #2 		//Cargo como byte lo que este en el bloque de datos
+	AND 	R1, #0x0000000f		//Dejo los 6 bits -sig, mediante una mascara.
+	LDRB	R1, [R0], R1		//Busco el valor en la tabla de conversion
+	STRB	R4, [R4], #3		//Guardo en la tabla de conversion
+	BX		LRS					//Vuelvo

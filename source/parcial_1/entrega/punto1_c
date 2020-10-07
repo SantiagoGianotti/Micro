@@ -1,0 +1,57 @@
+
+/* Subrutina_modulo
+ * Calcula el modulo de dos numeros de 16 bits. Devuelve el resultado en 16 bits.
+ * Parametro - R0 - dividendo, unsigned 16 bits
+ * Parametro - R1 - modulo,  unsigned 16 bits
+ * Retorno - Carga en [R0] el resultado del modulo.
+ */
+
+ /** subrutina_encodeo_cadena
+* Encodea una cadena de bytes en formato MIME. Utiliza subrutina_encodeo_mime y subrutina_modulo
+* @param R4 - Puntero a bloque de datos
+* @param R5 - Puntero cadena Resultado
+* @param R6 - Cantidad de bytes a convertir
+* @return VOID - Escribe en R5 los resultados.
+*/
+
+/**
+* Encodea una cadena de bytes en formato MIME. Utiliza subrutina_encodeo_cadena y subrutina_modulo
+* @param R0 - Puntero a bloque de datos
+* @param R1 - Puntero cadena Resultado
+* @param R2 - Cantidad de bytes a convertir
+* @return VOID - Escribe en R5 los resultados.
+*/
+subrutina_encodeo_seguro:
+	PUSH {R4-R7, LR}		//Guardo estos datos
+	LDR R4, R0			
+	LDR R5, R1			
+	LDR R6, R2			
+	LDR R0, R2  		//Copio la cantidad de bytes a convertir
+	MOV R1, #3			//cargo el modulo para subrutina
+	BL	subrutina_modulo //Me devuelve el resto de 3
+	LDR R7, R0			//En r7 se cuantos registros tengo que llenar con 0's e ='s
+	MOV R1, #0
+
+//Lleno con los 0's necesarios los primeros lugares de R5
+subrutina_e_s_lazo_ini:
+	CMP R1, #0			//Veo si debo salir de este mini lazo
+	ITTE	NE				
+	STRBNE R1, [R5], #1	//Relleno con 0's
+	SUBNE R1, #1			//loop hacia atras
+	BEQ subrutina_e_s_lazo_ini
+
+	//llamo a subrutina_encodeo_cadena asi me encodea todo
+	BL subrutina_encodeo_cadena
+	LDR R1, <el valor al que encodee =>
+
+
+//Lleno con los '=' necesarios los ultimos lugares de R5
+subrutina_e_s_lazo_ini:
+	CMP R7, #0			//Veo si debo salir de este mini lazo
+	ITTE	NE				
+	STRBNE R1, [R5], #1	//Relleno con 0's
+	SUBNE R1, #1			//loop hacia atras
+	BEQ subrutina_e_s_lazo_ini
+	POP {R4-R7}
+	BX					//fin func
+

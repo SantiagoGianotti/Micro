@@ -33,10 +33,11 @@ lazo:
 	LDR         R1, =resultado              // Cargo el puntero
 	BL          subrutina_divisores
     CMP         R6, R0                      // si cant div R6 menor R0, guardo R0
-    ITT         LO 
-    MOVLO       R0, R6                      // Guardo la cant de divisores
-    MOVLO       R0, R5                      // Guardo el numero de divisor
+    ITT         HS 
+    MOVHS       R0, R6                      // Guardo la cant de divisores
+    MOVHS       R0, R5                      // Guardo el numero de divisor
     CMP         R4, #255                    // El maximo valor a analizar
+    ADD         R4, #1
     BNE         lazo    
     LDR         R0, =numero                    
     STRB        R5, [R0], #1
