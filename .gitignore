@@ -7,3 +7,5 @@ Makefile
 proyecto.mk
 Readme
 /source/lab2/lab2_berre_totone
+ejemplos/conversor.s
+ejemplos/lab3/ejercicio01.s
